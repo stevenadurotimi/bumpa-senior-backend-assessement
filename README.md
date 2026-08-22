@@ -101,10 +101,43 @@ Seeded badges:
 
 ## API
 
+After running `php artisan migrate:fresh --seed`, demo users are available for manual testing. Fetch the user list first, copy an `id`, then call the achievement progress endpoint for that user.
+
+### List Users
+
+```http
+GET /users
+```
+
+Example response:
+
+```json
+{
+  "data": [
+    {
+      "id": 1,
+      "name": "New Customer",
+      "email": "new.customer@example.com",
+      "achievements_count": 0,
+      "badges_count": 0,
+      "purchases_count": 0,
+      "cashback_transactions_count": 0
+    }
+  ]
+}
+```
+
 ### Get User Achievement Progress
 
 ```http
 GET /users/{user}/achievements
+```
+
+Example manual test flow:
+
+```bash
+curl http://localhost:7000/users
+curl http://localhost:7000/users/1/achievements
 ```
 
 Example response for a new user:

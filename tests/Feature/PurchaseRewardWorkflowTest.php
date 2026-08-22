@@ -3,13 +3,13 @@
 use App\Contracts\Payments\CashbackPaymentProvider;
 use App\Events\PurchaseRecorded;
 use App\Models\CashbackTransaction;
+use App\Models\Achievement;
+use App\Models\Badge;
 use App\Models\Purchase;
 use App\Models\User;
 use App\Payments\Payload\CashbackPaymentRequest;
 use App\Payments\Payload\PaymentResult;
 use App\Support\RewardDefinitions;
-use Database\Seeders\AchievementSeeder;
-use Database\Seeders\BadgeSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 uses(RefreshDatabase::class);
@@ -27,9 +27,19 @@ class EndToEndCashbackPaymentProviderFake implements CashbackPaymentProvider
     }
 }
 
+function createPurchaseWorkflowDefinitions(): void
+{
+    foreach (RewardDefinitions::achievements() as $achievement) {
+        Achievement::query()->create($achievement);
+    }
+
+    foreach (RewardDefinitions::badges() as $badge) {
+        Badge::query()->create($badge);
+    }
+}
+
 it('records purchases, unlocks rewards, awards cashback, and returns final API progress', function () {
-    $this->seed(AchievementSeeder::class);
-    $this->seed(BadgeSeeder::class);
+    createPurchaseWorkflowDefinitions();
 
     $provider = new EndToEndCashbackPaymentProviderFake();
     app()->instance(CashbackPaymentProvider::class, $provider);

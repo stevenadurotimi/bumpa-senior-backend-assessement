@@ -3,13 +3,20 @@
 use App\Events\AchievementUnlocked;
 use App\Events\BadgeUnlocked;
 use App\Models\Achievement;
+use App\Models\Badge;
 use App\Models\User;
 use App\Support\RewardDefinitions;
-use Database\Seeders\BadgeSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 
 uses(RefreshDatabase::class);
+
+function createBadgeDefinitions(): void
+{
+    foreach (RewardDefinitions::badges() as $badge) {
+        Badge::query()->create($badge);
+    }
+}
 
 function createBadgeEvaluationAchievements(User $user, int $count): void
 {
@@ -31,7 +38,7 @@ function createBadgeEvaluationAchievements(User $user, int $count): void
 test('first unlocked achievement unlocks beginner badge', function () {
     Event::fake([BadgeUnlocked::class]);
 
-    $this->seed(BadgeSeeder::class);
+    createBadgeDefinitions();
 
     $user = User::factory()->create();
     createBadgeEvaluationAchievements($user, 1);
@@ -51,7 +58,7 @@ test('first unlocked achievement unlocks beginner badge', function () {
 test('badge thresholds are respected', function () {
     Event::fake([BadgeUnlocked::class]);
 
-    $this->seed(BadgeSeeder::class);
+    createBadgeDefinitions();
 
     $user = User::factory()->create();
     createBadgeEvaluationAchievements($user, 3);
@@ -67,7 +74,7 @@ test('badge thresholds are respected', function () {
 test('multiple eligible badges are unlocked in threshold order', function () {
     Event::fake([BadgeUnlocked::class]);
 
-    $this->seed(BadgeSeeder::class);
+    createBadgeDefinitions();
 
     $user = User::factory()->create();
     createBadgeEvaluationAchievements($user, 4);
@@ -90,7 +97,7 @@ test('multiple eligible badges are unlocked in threshold order', function () {
 test('reprocessing an achievement event does not duplicate badges', function () {
     Event::fake([BadgeUnlocked::class]);
 
-    $this->seed(BadgeSeeder::class);
+    createBadgeDefinitions();
 
     $user = User::factory()->create();
     createBadgeEvaluationAchievements($user, 4);

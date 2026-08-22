@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\UserAchievementController;
+use App\Http\Controllers\UserController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -10,4 +11,5 @@ Route::get('/', function () {
     ]);
 });
 
+Route::get('/users', [UserController::class, 'index']);
 Route::get('/users/{user}/achievements', UserAchievementController::class);

@@ -6,16 +6,22 @@ use App\Models\Achievement;
 use App\Models\Purchase;
 use App\Models\User;
 use App\Support\RewardDefinitions;
-use Database\Seeders\AchievementSeeder;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 
 uses(RefreshDatabase::class);
 
+function createPurchaseAchievementDefinitions(): void
+{
+    foreach (RewardDefinitions::achievements() as $achievement) {
+        Achievement::query()->create($achievement);
+    }
+}
+
 test('first purchase unlocks the first purchase achievement', function () {
     Event::fake([AchievementUnlocked::class]);
 
-    $this->seed(AchievementSeeder::class);
+    createPurchaseAchievementDefinitions();
 
     $user = User::factory()->create();
     $purchase = Purchase::create([
@@ -39,7 +45,7 @@ test('first purchase unlocks the first purchase achievement', function () {
 test('fifth purchase unlocks all eligible purchase milestones', function () {
     Event::fake([AchievementUnlocked::class]);
 
-    $this->seed(AchievementSeeder::class);
+    createPurchaseAchievementDefinitions();
 
     $user = User::factory()->create();
 
@@ -69,7 +75,7 @@ test('fifth purchase unlocks all eligible purchase milestones', function () {
 test('reprocessing the same purchase event does not duplicate achievements', function () {
     Event::fake([AchievementUnlocked::class]);
 
-    $this->seed(AchievementSeeder::class);
+    createPurchaseAchievementDefinitions();
 
     $user = User::factory()->create();
 
