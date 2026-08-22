@@ -30,8 +30,19 @@ RUN composer install --no-interaction --prefer-dist --optimize-autoloader --no-s
 # Copy the Laravel application source into the image.
 COPY . .
 
-# Rebuild the optimized autoloader after the full source tree is available.
-RUN composer dump-autoload --optimize
+# Create a container-local env file from the safe example file. Docker Compose
+# still overrides these values at runtime, and real local secrets stay ignored.
+RUN cp .env.example .env \
+    && sed -i 's|^APP_KEY=$|APP_KEY=base64:DvpfzRoNKQVPRVJDnCpembliSha2Vu2fsFAKGH+Hnlk=|' .env \
+    && sed -i 's|^APP_URL=.*|APP_URL=http://localhost:7000|' .env \
+    && sed -i 's|^DB_HOST=.*|DB_HOST=database|' .env \
+    && sed -i 's|^DB_PORT=.*|DB_PORT=5432|' .env \
+    && sed -i 's|^DB_DATABASE=.*|DB_DATABASE=bumpa|' .env \
+    && sed -i 's|^DB_USERNAME=.*|DB_USERNAME=bumpa|' .env \
+    && sed -i 's|^DB_PASSWORD=.*|DB_PASSWORD=secret|' .env \
+    && sed -i 's|^CASHBACK_PAYMENT_PROVIDER=.*|CASHBACK_PAYMENT_PROVIDER=payment_mock|' .env \
+    && sed -i 's|^PAYMENT_MOCK_MODE=.*|PAYMENT_MOCK_MODE=docker|' .env \
+    && composer dump-autoload --optimize
 
 # The Laravel development server listens on port 8000 inside the container.
 EXPOSE 8000
