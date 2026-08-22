@@ -68,6 +68,7 @@ class AwardBadgeCashback
         ));
 
         $transaction->update([
+            'user_payout_account_id' => $payoutAccount->getKey(),
             'status' => $result->successful ? 'successful' : 'failed',
             'provider_reference' => $result->providerReference,
             'failure_reason' => $result->failureReason,

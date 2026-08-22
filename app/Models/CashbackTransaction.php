@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[Fillable([
     'user_id',
+    'user_payout_account_id',
     'badge_id',
     'amount_kobo',
     'provider',
@@ -25,6 +26,14 @@ class CashbackTransaction extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * @return BelongsTo<UserPayoutAccount, $this>
+     */
+    public function payoutAccount(): BelongsTo
+    {
+        return $this->belongsTo(UserPayoutAccount::class, 'user_payout_account_id');
     }
 
     /**

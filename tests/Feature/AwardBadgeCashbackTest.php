@@ -71,8 +71,10 @@ it('awards 300 naira cashback when a badge is unlocked', function () {
         ->and($provider->requests[0]->idempotencyKey)->toBe("badge-cashback:{$user->id}:{$badge->id}");
 
     $transaction = CashbackTransaction::query()->sole();
+    $payoutAccount = $user->payoutAccount;
 
     expect($transaction->user->is($user))->toBeTrue()
+        ->and($transaction->payoutAccount->is($payoutAccount))->toBeTrue()
         ->and($transaction->badge->is($badge))->toBeTrue()
         ->and($transaction->amount_kobo)->toBe(30000)
         ->and($transaction->provider)->toBe('flutterwave')

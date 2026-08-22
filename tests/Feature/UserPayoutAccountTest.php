@@ -24,6 +24,35 @@ it('stores one payout account for a user', function () {
         ->and($payoutAccount->user->is($user))->toBeTrue();
 });
 
+it('has many cashback transactions', function () {
+    $user = User::factory()->create();
+    $badge = App\Models\Badge::query()->create([
+        'name' => 'Beginner',
+        'required_achievements_count' => 1,
+        'sort_order' => 1,
+    ]);
+
+    $payoutAccount = $user->payoutAccount()->create([
+        'provider' => 'flutterwave',
+        'bank_code' => '044',
+        'account_number' => '0123456789',
+        'account_name' => 'Jane Doe',
+        'currency' => 'NGN',
+    ]);
+
+    $transaction = $payoutAccount->cashbackTransactions()->create([
+        'user_id' => $user->id,
+        'badge_id' => $badge->id,
+        'amount_kobo' => 30000,
+        'provider' => 'flutterwave',
+        'idempotency_key' => "badge-cashback:{$user->id}:{$badge->id}",
+        'status' => 'successful',
+    ]);
+
+    expect($payoutAccount->cashbackTransactions()->sole()->is($transaction))->toBeTrue()
+        ->and($transaction->payoutAccount->is($payoutAccount))->toBeTrue();
+});
+
 it('allows only one payout account per user', function () {
     $user = User::factory()->create();
 
