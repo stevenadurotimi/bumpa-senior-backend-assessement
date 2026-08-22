@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\UserAchievementController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -8,3 +9,5 @@ Route::get('/', function () {
         'status' => 'ok',
     ]);
 });
+
+Route::get('/users/{user}/achievements', UserAchievementController::class);
