@@ -4,6 +4,9 @@ namespace App\Support;
 
 final class RewardDefinitions
 {
+    public const GROUP_PURCHASES = 'purchases';
+    public const TRIGGER_PURCHASE_COUNT = 'purchase_count';
+
     public const ACHIEVEMENT_FIRST_PURCHASE = 'First Purchase';
     public const ACHIEVEMENT_5_PURCHASES = '5 Purchases';
     public const ACHIEVEMENT_10_PURCHASES = '10 Purchases';
@@ -22,29 +25,29 @@ final class RewardDefinitions
         return [
             [
                 'name' => self::ACHIEVEMENT_FIRST_PURCHASE,
-                'group' => 'purchases',
-                'trigger_type' => 'purchase_count',
+                'group' => self::GROUP_PURCHASES,
+                'trigger_type' => self::TRIGGER_PURCHASE_COUNT,
                 'threshold' => 1,
                 'sort_order' => 1,
             ],
             [
                 'name' => self::ACHIEVEMENT_5_PURCHASES,
-                'group' => 'purchases',
-                'trigger_type' => 'purchase_count',
+                'group' => self::GROUP_PURCHASES,
+                'trigger_type' => self::TRIGGER_PURCHASE_COUNT,
                 'threshold' => 5,
                 'sort_order' => 2,
             ],
             [
                 'name' => self::ACHIEVEMENT_10_PURCHASES,
-                'group' => 'purchases',
-                'trigger_type' => 'purchase_count',
+                'group' => self::GROUP_PURCHASES,
+                'trigger_type' => self::TRIGGER_PURCHASE_COUNT,
                 'threshold' => 10,
                 'sort_order' => 3,
             ],
             [
                 'name' => self::ACHIEVEMENT_20_PURCHASES,
-                'group' => 'purchases',
-                'trigger_type' => 'purchase_count',
+                'group' => self::GROUP_PURCHASES,
+                'trigger_type' => self::TRIGGER_PURCHASE_COUNT,
                 'threshold' => 20,
                 'sort_order' => 4,
             ],
