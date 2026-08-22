@@ -7,8 +7,12 @@ use Illuminate\Http\JsonResponse;
 
 class UserController extends Controller
 {
+    /**
+     * Provide seeded users for testers so they can choose an id manually.
+     */
     public function index(): JsonResponse
     {
+        // Counts make it clear which demo users already have reward progress.
         $users = User::query()
             ->withCount(['achievements', 'badges', 'purchases', 'cashbackTransactions'])
             ->orderBy('id')

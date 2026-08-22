@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Badge;
 use App\Models\User;
 use App\Models\UserPayoutAccount;
 use Illuminate\Database\UniqueConstraintViolationException;
@@ -26,7 +27,7 @@ it('stores one payout account for a user', function () {
 
 it('has many cashback transactions', function () {
     $user = User::factory()->create();
-    $badge = App\Models\Badge::query()->create([
+    $badge = Badge::query()->create([
         'name' => 'Beginner',
         'required_achievements_count' => 1,
         'sort_order' => 1,

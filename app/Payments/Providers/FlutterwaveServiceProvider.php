@@ -12,13 +12,16 @@ use Illuminate\Support\Facades\Http;
 readonly class FlutterwaveServiceProvider implements CashbackPaymentProvider
 {
     /**
-     * @param array<string, mixed> $config
+     * Flutterwave v3 configuration comes from config/cashback.php.
+     *
+     * @param  array<string, mixed>  $config
      */
     public function __construct(private array $config) {}
 
     public function sendCashback(CashbackPaymentRequest $request): PaymentResult
     {
         try {
+            // Flutterwave v3 transfers are authorized directly with secret key.
             $response = $this->flutterwaveRequest()
                 ->post($this->endpoint('/transfers'), $this->payload($request));
         } catch (ConnectionException $exception) {
@@ -51,6 +54,8 @@ readonly class FlutterwaveServiceProvider implements CashbackPaymentProvider
     }
 
     /**
+     * Build the v3 transfer payload for paying cashback to a bank account.
+     *
      * @return array<string, mixed>
      */
     private function payload(CashbackPaymentRequest $request): array

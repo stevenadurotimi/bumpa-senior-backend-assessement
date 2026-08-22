@@ -10,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 class Achievement extends Model
 {
     /**
+     * Users that have unlocked this achievement.
+     *
      * @return BelongsToMany<User, $this>
      */
     public function users(): BelongsToMany

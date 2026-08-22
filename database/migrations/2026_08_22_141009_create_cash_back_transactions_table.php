@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('cashback_transactions', function (Blueprint $table) {
             $table->id();
+            // Cashback is stateful, so it is modeled separately from badge_user.
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('badge_id')->constrained()->cascadeOnDelete();
             $table->unsignedInteger('amount_kobo')->default(30000);
@@ -24,6 +25,7 @@ return new class extends Migration
             $table->json('metadata')->nullable();
             $table->timestamps();
 
+            // A user should receive cashback only once for each badge.
             $table->unique(['user_id', 'badge_id']);
         });
     }

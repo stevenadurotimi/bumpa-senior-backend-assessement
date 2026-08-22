@@ -10,5 +10,8 @@ class PurchaseRecorded
 {
     use Dispatchable, SerializesModels;
 
+    /**
+     * Carries the purchase that should be evaluated for reward milestones.
+     */
     public function __construct(public Purchase $purchase) {}
 }

@@ -12,6 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('cashback_transactions', function (Blueprint $table) {
+            // Preserve which payout account was used for audit/history.
             $table->foreignId('user_payout_account_id')
                 ->nullable()
                 ->after('user_id')

@@ -19,11 +19,15 @@ return [
     'provider' => env('CASHBACK_PAYMENT_PROVIDER', 'payment_mock'),
 
     'providers' => [
+        // Default provider for local testing and reviewer demos. No secrets or
+        // external HTTP calls are required.
         'payment_mock' => [
             'handler' => PaymentMockServiceProvider::class,
             'mode' => env('PAYMENT_MOCK_MODE', 'local'),
         ],
 
+        // Real Flutterwave v3 transfer provider. Enable by setting
+        // CASHBACK_PAYMENT_PROVIDER=flutterwave and providing a secret key.
         'flutterwave' => [
             'handler' => FlutterwaveServiceProvider::class,
             'secret_key' => env('FLUTTERWAVE_SECRET_KEY'),

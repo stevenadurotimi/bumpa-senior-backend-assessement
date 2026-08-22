@@ -14,6 +14,7 @@ class AchievementSeeder extends Seeder
     public function run(): void
     {
         foreach (RewardDefinitions::achievements() as $achievement) {
+            // updateOrCreate keeps reseeding safe during repeated local testing.
             Achievement::updateOrCreate(
                 ['name' => $achievement['name']],
                 $achievement,

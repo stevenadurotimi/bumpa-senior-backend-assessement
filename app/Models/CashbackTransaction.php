@@ -21,6 +21,8 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class CashbackTransaction extends Model
 {
     /**
+     * User receiving this cashback.
+     *
      * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
@@ -29,6 +31,8 @@ class CashbackTransaction extends Model
     }
 
     /**
+     * Bank account used for the transfer, if one existed at payment time.
+     *
      * @return BelongsTo<UserPayoutAccount, $this>
      */
     public function payoutAccount(): BelongsTo
@@ -37,6 +41,8 @@ class CashbackTransaction extends Model
     }
 
     /**
+     * Badge that triggered this cashback.
+     *
      * @return BelongsTo<Badge, $this>
      */
     public function badge(): BelongsTo

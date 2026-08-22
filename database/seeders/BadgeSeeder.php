@@ -14,6 +14,7 @@ class BadgeSeeder extends Seeder
     public function run(): void
     {
         foreach (RewardDefinitions::badges() as $badge) {
+            // updateOrCreate keeps reseeding safe during repeated local testing.
             Badge::updateOrCreate(
                 ['name' => $badge['name']],
                 $badge,

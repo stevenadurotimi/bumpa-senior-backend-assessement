@@ -11,13 +11,18 @@ use Illuminate\Support\Facades\Event;
 
 class AchievementService
 {
+    /**
+     * Unlock one achievement for a user and emit the assessment-required event.
+     */
     public function unlock(User $user, Achievement $achievement): bool
     {
+        // Fast path for normal duplicate calls before attempting a database write.
         if ($user->achievements()->whereKey($achievement->getKey())->exists()) {
             return false;
         }
 
         try {
+            // The pivot unique constraint is the final idempotency guard.
             $user->achievements()->attach($achievement->getKey(), [
                 'unlocked_at' => now(),
             ]);
@@ -31,6 +36,8 @@ class AchievementService
     }
 
     /**
+     * Build the read model used by GET /users/{user}/achievements.
+     *
      * @return array{
      *     unlocked_achievements: list<string>,
      *     next_available_achievements: list<string>,
@@ -41,6 +48,7 @@ class AchievementService
      */
     public function progressFor(User $user): array
     {
+        // The API returns unlocked achievements as ordered names, not database rows.
         $unlockedAchievements = $user->achievements()
             ->orderBy('sort_order')
             ->orderBy('threshold')
@@ -49,11 +57,13 @@ class AchievementService
         $unlockedAchievementIds = $unlockedAchievements->modelKeys();
         $unlockedAchievementCount = $unlockedAchievements->count();
 
+        // The current badge is the highest threshold badge the user has unlocked.
         $currentBadge = $user->badges()
             ->orderByDesc('required_achievements_count')
             ->orderByDesc('sort_order')
             ->first();
 
+        // The next badge is the first badge above the current badge threshold.
         $nextBadge = Badge::query()
             ->when(
                 $currentBadge,
@@ -78,8 +88,10 @@ class AchievementService
     }
 
     /**
-     * @param list<int|string> $unlockedAchievementIds
+     * Return only one locked achievement per group so the API shows the next
+     * target in each category instead of every possible future milestone.
      *
+     * @param  list<int|string>  $unlockedAchievementIds
      * @return list<string>
      */
     private function nextAvailableAchievementNames(array $unlockedAchievementIds): array

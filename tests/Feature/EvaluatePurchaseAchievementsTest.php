@@ -18,6 +18,21 @@ function createPurchaseAchievementDefinitions(): void
     }
 }
 
+test('creating a purchase dispatches reward evaluation and unlocks eligible achievements', function () {
+    createPurchaseAchievementDefinitions();
+
+    $user = User::factory()->create();
+
+    Purchase::create([
+        'user_id' => $user->id,
+        'reference' => 'purchase-001',
+        'amount' => 5000,
+    ]);
+
+    expect($user->achievements()->pluck('name')->all())
+        ->toBe([RewardDefinitions::ACHIEVEMENT_FIRST_PURCHASE]);
+});
+
 test('first purchase unlocks the first purchase achievement', function () {
     Event::fake([AchievementUnlocked::class]);
 

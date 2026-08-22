@@ -11,8 +11,12 @@ readonly class EvaluatePurchaseAchievements
 {
     public function __construct(private AchievementService $achievementService) {}
 
+    /**
+     * Re-check purchase milestones whenever a purchase is recorded.
+     */
     public function handle(PurchaseRecorded $event): void
     {
+        // loadMissing avoids re-querying the user if the purchase already has it.
         $purchase = $event->purchase->loadMissing('user');
         $user = $purchase->user;
         $purchaseCount = $user->purchases()->count();
@@ -31,6 +35,8 @@ readonly class EvaluatePurchaseAchievements
             ->where('trigger_type', RewardDefinitions::TRIGGER_PURCHASE_COUNT)
             ->where('threshold', '<=', $purchaseCount)
             ->orderBy('threshold')
-            ->each(fn (Achievement $achievement) => $this->achievementService->unlock($user, $achievement));
+            ->each(function (Achievement $achievement) use ($user): void {
+                $this->achievementService->unlock($user, $achievement);
+            });
     }
 }

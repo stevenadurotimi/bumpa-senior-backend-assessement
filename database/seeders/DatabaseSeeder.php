@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
+        // Definitions are seeded first because demo data references them.
         $this->call([
             AchievementSeeder::class,
             BadgeSeeder::class,

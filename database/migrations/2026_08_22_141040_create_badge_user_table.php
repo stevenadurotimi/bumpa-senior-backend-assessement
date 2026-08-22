@@ -13,11 +13,13 @@ return new class extends Migration
     {
         Schema::create('badge_user', function (Blueprint $table) {
             $table->id();
+            // Pivot history for which badges a user has unlocked.
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('badge_id')->constrained()->cascadeOnDelete();
             $table->timestamp('unlocked_at')->useCurrent();
             $table->timestamps();
 
+            // Enforce idempotent badge unlocking at the database layer.
             $table->unique(['user_id', 'badge_id']);
         });
     }

@@ -9,12 +9,15 @@ use App\Payments\Payload\PaymentResult;
 readonly class PaymentMockServiceProvider implements CashbackPaymentProvider
 {
     /**
-     * @param array<string, mixed> $config
+     * Mock configuration comes from config/cashback.php and is safe for demos.
+     *
+     * @param  array<string, mixed>  $config
      */
     public function __construct(private array $config) {}
 
     public function sendCashback(CashbackPaymentRequest $request): PaymentResult
     {
+        // Mirror a successful provider response without making an HTTP request.
         $providerReference = "mock-transfer-{$request->reference}";
 
         return PaymentResult::success('successful', $providerReference, [

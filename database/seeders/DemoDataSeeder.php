@@ -19,6 +19,8 @@ class DemoDataSeeder extends Seeder
      */
     public function run(): void
     {
+        // Load definition records once so the seeded users can represent
+        // realistic progress states.
         $firstPurchase = Achievement::query()->where('name', RewardDefinitions::ACHIEVEMENT_FIRST_PURCHASE)->sole();
         $fivePurchases = Achievement::query()->where('name', RewardDefinitions::ACHIEVEMENT_5_PURCHASES)->sole();
         $tenPurchases = Achievement::query()->where('name', RewardDefinitions::ACHIEVEMENT_10_PURCHASES)->sole();
@@ -26,9 +28,11 @@ class DemoDataSeeder extends Seeder
         $beginner = Badge::query()->where('name', RewardDefinitions::BADGE_BEGINNER)->sole();
         $intermediate = Badge::query()->where('name', RewardDefinitions::BADGE_INTERMEDIATE)->sole();
 
+        // No progress yet: useful for the empty achievement endpoint response.
         $newUser = $this->user('New Customer', 'new.customer@example.com');
         $this->payoutAccount($newUser, 'New Customer');
 
+        // First-purchase state: one achievement, one badge, one cashback.
         $beginnerUser = $this->user('Beginner Customer', 'beginner.customer@example.com');
         $beginnerPayoutAccount = $this->payoutAccount($beginnerUser, 'Beginner Customer');
         $this->purchases($beginnerUser, 1);
@@ -36,6 +40,7 @@ class DemoDataSeeder extends Seeder
         $this->unlockBadges($beginnerUser, [$beginner]);
         $this->successfulCashback($beginnerUser, $beginnerPayoutAccount, $beginner);
 
+        // Active state: enough purchases to show the next purchase milestone.
         $activeUser = $this->user('Active Customer', 'active.customer@example.com');
         $activePayoutAccount = $this->payoutAccount($activeUser, 'Active Customer');
         $this->purchases($activeUser, 5);
@@ -43,6 +48,7 @@ class DemoDataSeeder extends Seeder
         $this->unlockBadges($activeUser, [$beginner]);
         $this->successfulCashback($activeUser, $activePayoutAccount, $beginner);
 
+        // Higher purchase count without the next badge yet.
         $powerUser = $this->user('Power Customer', 'power.customer@example.com');
         $powerPayoutAccount = $this->payoutAccount($powerUser, 'Power Customer');
         $this->purchases($powerUser, 10);
@@ -50,12 +56,14 @@ class DemoDataSeeder extends Seeder
         $this->unlockBadges($powerUser, [$beginner]);
         $this->successfulCashback($powerUser, $powerPayoutAccount, $beginner);
 
+        // Failure state: badge unlocked but cashback cannot be paid.
         $missingPayoutUser = $this->user('Missing Payout Customer', 'missing.payout@example.com');
         $this->purchases($missingPayoutUser, 1);
         $this->unlockAchievements($missingPayoutUser, [$firstPurchase]);
         $this->unlockBadges($missingPayoutUser, [$beginner]);
         $this->failedCashback($missingPayoutUser, $beginner, 'User does not have a payout account.');
 
+        // Multi-badge state: useful for checking current/next badge behavior.
         $intermediateUser = $this->user('Intermediate Customer', 'intermediate.customer@example.com');
         $intermediatePayoutAccount = $this->payoutAccount($intermediateUser, 'Intermediate Customer');
         $this->purchases($intermediateUser, 20);
@@ -67,6 +75,8 @@ class DemoDataSeeder extends Seeder
 
     private function user(string $name, string $email): User
     {
+        // Every demo user uses the same password for simple manual login if auth
+        // is added later.
         return User::query()->updateOrCreate(
             ['email' => $email],
             [
@@ -79,6 +89,7 @@ class DemoDataSeeder extends Seeder
 
     private function payoutAccount(User $user, string $accountName): UserPayoutAccount
     {
+        // Use deterministic account numbers so reseeding updates, not duplicates.
         return UserPayoutAccount::query()->updateOrCreate(
             ['user_id' => $user->getKey()],
             [
@@ -94,6 +105,7 @@ class DemoDataSeeder extends Seeder
     private function purchases(User $user, int $count): void
     {
         foreach (range(1, $count) as $purchaseNumber) {
+            // References are deterministic to keep the seeder idempotent.
             Purchase::query()->updateOrCreate(
                 ['reference' => "seed-user-{$user->getKey()}-purchase-{$purchaseNumber}"],
                 [
@@ -105,7 +117,7 @@ class DemoDataSeeder extends Seeder
     }
 
     /**
-     * @param array<int, Achievement> $achievements
+     * @param  array<int, Achievement>  $achievements
      */
     private function unlockAchievements(User $user, array $achievements): void
     {
@@ -117,7 +129,7 @@ class DemoDataSeeder extends Seeder
     }
 
     /**
-     * @param array<int, Badge> $badges
+     * @param  array<int, Badge>  $badges
      */
     private function unlockBadges(User $user, array $badges): void
     {
@@ -130,6 +142,7 @@ class DemoDataSeeder extends Seeder
 
     private function successfulCashback(User $user, UserPayoutAccount $payoutAccount, Badge $badge): void
     {
+        // Seed the same shape the real listener writes after a successful payout.
         CashbackTransaction::query()->updateOrCreate(
             [
                 'user_id' => $user->getKey(),
@@ -153,6 +166,7 @@ class DemoDataSeeder extends Seeder
 
     private function failedCashback(User $user, Badge $badge, string $failureReason): void
     {
+        // Seed a failure case so testers can inspect error-state cashback rows.
         CashbackTransaction::query()->updateOrCreate(
             [
                 'user_id' => $user->getKey(),

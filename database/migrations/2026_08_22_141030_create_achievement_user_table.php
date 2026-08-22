@@ -13,11 +13,13 @@ return new class extends Migration
     {
         Schema::create('achievement_user', function (Blueprint $table) {
             $table->id();
+            // Pivot history for which achievements a user has unlocked.
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('achievement_id')->constrained()->cascadeOnDelete();
             $table->timestamp('unlocked_at')->useCurrent();
             $table->timestamps();
 
+            // Enforce idempotent achievement unlocking at the database layer.
             $table->unique(['user_id', 'achievement_id']);
         });
     }

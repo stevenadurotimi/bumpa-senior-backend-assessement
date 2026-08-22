@@ -2,9 +2,9 @@
 
 use App\Contracts\Payments\CashbackPaymentProvider;
 use App\Events\PurchaseRecorded;
-use App\Models\CashbackTransaction;
 use App\Models\Achievement;
 use App\Models\Badge;
+use App\Models\CashbackTransaction;
 use App\Models\Purchase;
 use App\Models\User;
 use App\Payments\Payload\CashbackPaymentRequest;
@@ -41,7 +41,7 @@ function createPurchaseWorkflowDefinitions(): void
 it('records purchases, unlocks rewards, awards cashback, and returns final API progress', function () {
     createPurchaseWorkflowDefinitions();
 
-    $provider = new EndToEndCashbackPaymentProviderFake();
+    $provider = new EndToEndCashbackPaymentProviderFake;
     app()->instance(CashbackPaymentProvider::class, $provider);
 
     $user = User::factory()->create();

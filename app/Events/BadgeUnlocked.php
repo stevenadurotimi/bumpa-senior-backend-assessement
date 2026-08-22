@@ -10,6 +10,9 @@ class BadgeUnlocked
 {
     use Dispatchable, SerializesModels;
 
+    /**
+     * Payload required by the assessment when a badge is newly unlocked.
+     */
     public function __construct(
         public string $badge_name,
         public User $user,

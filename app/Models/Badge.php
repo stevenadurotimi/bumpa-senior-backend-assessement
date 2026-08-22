@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Badge extends Model
 {
     /**
+     * Users that have unlocked this badge.
+     *
      * @return BelongsToMany<User, $this>
      */
     public function users(): BelongsToMany
@@ -21,6 +23,8 @@ class Badge extends Model
     }
 
     /**
+     * Cashback attempts created because this badge was unlocked.
+     *
      * @return HasMany<CashbackTransaction, $this>
      */
     public function cashbackTransactions(): HasMany

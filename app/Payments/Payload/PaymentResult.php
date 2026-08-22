@@ -5,7 +5,9 @@ namespace App\Payments\Payload;
 readonly class PaymentResult
 {
     /**
-     * @param array<string, mixed> $rawResponse
+     * Normalized result stored on CashbackTransaction regardless of provider.
+     *
+     * @param  array<string, mixed>  $rawResponse
      */
     public function __construct(
         public bool $successful,
@@ -13,11 +15,10 @@ readonly class PaymentResult
         public ?string $providerReference = null,
         public ?string $failureReason = null,
         public array $rawResponse = [],
-    ) {
-    }
+    ) {}
 
     /**
-     * @param array<string, mixed> $rawResponse
+     * @param  array<string, mixed>  $rawResponse
      */
     public static function success(string $status, ?string $providerReference, array $rawResponse = []): self
     {
@@ -25,7 +26,7 @@ readonly class PaymentResult
     }
 
     /**
-     * @param array<string, mixed> $rawResponse
+     * @param  array<string, mixed>  $rawResponse
      */
     public static function failure(string $status, string $failureReason, array $rawResponse = []): self
     {

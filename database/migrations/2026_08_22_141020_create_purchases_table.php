@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('purchases', function (Blueprint $table) {
             $table->id();
+            // Minimal purchase record used only for achievement counting.
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('reference')->nullable()->unique();
             $table->unsignedInteger('amount')->nullable();

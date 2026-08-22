@@ -21,6 +21,8 @@ class User extends Authenticatable
     use HasFactory, Notifiable;
 
     /**
+     * Achievements this user has unlocked.
+     *
      * @return BelongsToMany<Achievement, $this>
      */
     public function achievements(): BelongsToMany
@@ -31,6 +33,8 @@ class User extends Authenticatable
     }
 
     /**
+     * Badges this user has unlocked.
+     *
      * @return BelongsToMany<Badge, $this>
      */
     public function badges(): BelongsToMany
@@ -41,6 +45,8 @@ class User extends Authenticatable
     }
 
     /**
+     * Purchases counted toward purchase-based achievements.
+     *
      * @return HasMany<Purchase, $this>
      */
     public function purchases(): HasMany
@@ -49,6 +55,8 @@ class User extends Authenticatable
     }
 
     /**
+     * Cashback attempts/results for this user.
+     *
      * @return HasMany<CashbackTransaction, $this>
      */
     public function cashbackTransactions(): HasMany
@@ -57,6 +65,8 @@ class User extends Authenticatable
     }
 
     /**
+     * One bank payout account used for cashback transfers.
+     *
      * @return HasOne<UserPayoutAccount, $this>
      */
     public function payoutAccount(): HasOne

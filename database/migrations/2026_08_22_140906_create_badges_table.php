@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('badges', function (Blueprint $table) {
             $table->id();
+            // Each badge is a named achievement-count threshold.
             $table->string('name')->unique();
             $table->unsignedInteger('required_achievements_count')->unique();
             $table->unsignedInteger('sort_order')->default(0);

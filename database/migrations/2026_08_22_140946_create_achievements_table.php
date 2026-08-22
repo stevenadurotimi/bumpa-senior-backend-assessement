@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('achievements', function (Blueprint $table) {
             $table->id();
+            // Group and trigger_type make achievement rules data-driven.
             $table->string('name')->unique();
             $table->string('group')->index();
             $table->string('trigger_type')->index();
@@ -20,6 +21,7 @@ return new class extends Migration
             $table->unsignedInteger('sort_order')->default(0);
             $table->timestamps();
 
+            // Prevent duplicate milestone definitions for the same rule.
             $table->unique(['group', 'trigger_type', 'threshold']);
         });
     }

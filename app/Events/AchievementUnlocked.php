@@ -10,6 +10,9 @@ class AchievementUnlocked
 {
     use Dispatchable, SerializesModels;
 
+    /**
+     * Payload required by the assessment when an achievement is newly unlocked.
+     */
     public function __construct(
         public string $achievement_name,
         public User $user,

@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('user_payout_accounts', function (Blueprint $table) {
             $table->id();
+            // One payout account per user keeps cashback routing simple.
             $table->foreignId('user_id')->unique()->constrained()->cascadeOnDelete();
             $table->string('provider')->default('flutterwave');
             $table->string('bank_code');

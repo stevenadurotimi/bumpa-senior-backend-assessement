@@ -18,6 +18,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class UserPayoutAccount extends Model
 {
     /**
+     * User who owns this payout account.
+     *
      * @return BelongsTo<User, $this>
      */
     public function user(): BelongsTo
@@ -26,6 +28,8 @@ class UserPayoutAccount extends Model
     }
 
     /**
+     * Cashback transactions that used this payout account.
+     *
      * @return HasMany<CashbackTransaction, $this>
      */
     public function cashbackTransactions(): HasMany

@@ -7,7 +7,9 @@ use App\Models\User;
 readonly class CashbackPaymentRequest
 {
     /**
-     * @param array<string, mixed> $metadata
+     * Provider-neutral payload for sending badge cashback to a bank account.
+     *
+     * @param  array<string, mixed>  $metadata
      */
     public function __construct(
         public User $user,
@@ -19,11 +21,11 @@ readonly class CashbackPaymentRequest
         public string $currency = 'NGN',
         public string $narration = 'Bumpa badge cashback',
         public array $metadata = [],
-    ) {
-    }
+    ) {}
 
     public function amountInNaira(): float
     {
+        // Cashback is stored internally as kobo but Flutterwave expects naira.
         return $this->amountKobo / 100;
     }
 }
