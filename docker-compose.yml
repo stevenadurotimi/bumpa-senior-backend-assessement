@@ -1,0 +1,83 @@
+services:
+  # Laravel application container.
+  app:
+    # Build the app image from the local Dockerfile.
+    build:
+      context: .
+      dockerfile: Dockerfile
+
+    # Override the Dockerfile CMD when using Compose.
+    # This runs database migrations before starting the Laravel server.
+    command: sh -c "php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8000"
+
+    # Runtime environment for the Laravel app inside Docker.
+    # The app connects to Postgres through the Compose service name: `database`.
+    environment:
+      APP_NAME: Bumpa
+      APP_ENV: local
+      APP_KEY: ${APP_KEY:-base64:DvpfzRoNKQVPRVJDnCpembliSha2Vu2fsFAKGH+Hnlk=}
+      APP_DEBUG: true
+      APP_URL: http://localhost:7000
+      LOG_CHANNEL: stderr
+      DB_CONNECTION: pgsql
+      DB_HOST: database
+      DB_PORT: 5432
+      DB_DATABASE: bumpa
+      DB_USERNAME: bumpa
+      DB_PASSWORD: secret
+      SESSION_DRIVER: database
+      CACHE_STORE: database
+      QUEUE_CONNECTION: database
+
+    # Expose the app at http://localhost:7000 on the host machine.
+    # The container still listens on port 8000 internally.
+    ports:
+      - "7000:8000"
+
+    # Wait until Postgres passes its healthcheck before starting the app.
+    depends_on:
+      database:
+        condition: service_healthy
+
+    # Attach the app to the private Compose network so it can reach Postgres.
+    networks:
+      - bumpa
+
+  # Postgres database used by both the Docker app and local development.
+  database:
+    image: postgres:17
+
+    # Initial database, user, and password created by the Postgres image.
+    environment:
+      POSTGRES_DB: bumpa
+      POSTGRES_USER: bumpa
+      POSTGRES_PASSWORD: secret
+
+    # Expose Postgres to the host for local development.
+    # DB_FORWARD_PORT wins first, then DB_PORT from .env, then 5432.
+    ports:
+      - "${DB_FORWARD_PORT:-${DB_PORT:-5432}}:5432"
+
+    # Persist Postgres data across container restarts.
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    # Mark the database healthy only after it accepts connections.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U bumpa -d bumpa"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+    # Attach the database to the same private network as the app.
+    networks:
+      - bumpa
+
+# Named Docker volume for persisted Postgres data.
+volumes:
+  postgres_data:
+
+# Private bridge network for app-to-database communication.
+networks:
+  bumpa:
+    driver: bridge
