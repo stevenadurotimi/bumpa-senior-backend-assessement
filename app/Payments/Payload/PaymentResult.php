@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Payments;
+namespace App\Payments\Payload;
 
 readonly class PaymentResult
 {

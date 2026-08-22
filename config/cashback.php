@@ -1,6 +1,7 @@
 <?php
 
-use App\Payments\FlutterwaveServiceProvider;
+use App\Payments\Providers\FlutterwaveServiceProvider;
+use App\Payments\Providers\PaymentMockServiceProvider;
 
 return [
 
@@ -15,17 +16,19 @@ return [
     |
     */
 
-    'provider' => env('CASHBACK_PAYMENT_PROVIDER', 'flutterwave'),
+    'provider' => env('CASHBACK_PAYMENT_PROVIDER', 'payment_mock'),
 
     'providers' => [
+        'payment_mock' => [
+            'handler' => PaymentMockServiceProvider::class,
+            'mode' => env('PAYMENT_MOCK_MODE', 'local'),
+        ],
+
         'flutterwave' => [
             'handler' => FlutterwaveServiceProvider::class,
-            'client_id' => env('FLUTTERWAVE_CLIENT_ID'),
-            'client_secret' => env('FLUTTERWAVE_CLIENT_SECRET'),
-            'token_url' => env('FLUTTERWAVE_TOKEN_URL', 'https://idp.flutterwave.com/realms/flutterwave/protocol/openid-connect/token'),
-            'base_url' => env('FLUTTERWAVE_BASE_URL', 'https://developersandbox-api.flutterwave.com'),
+            'secret_key' => env('FLUTTERWAVE_SECRET_KEY'),
+            'base_url' => env('FLUTTERWAVE_BASE_URL', 'https://api.flutterwave.com/v3'),
             'callback_url' => env('FLUTTERWAVE_CALLBACK_URL'),
-            'scenario_key' => env('FLUTTERWAVE_SCENARIO_KEY'),
         ],
     ],
 

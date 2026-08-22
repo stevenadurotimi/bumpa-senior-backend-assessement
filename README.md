@@ -168,19 +168,30 @@ Cashback is integrated through `App\Contracts\Payments\CashbackPaymentProvider`.
 The active provider is configured in `config/cashback.php`:
 
 ```php
-'provider' => env('CASHBACK_PAYMENT_PROVIDER', 'flutterwave'),
+'provider' => env('CASHBACK_PAYMENT_PROVIDER', 'payment_mock'),
 ```
 
-Flutterwave is the current implementation. Provider-specific settings are read from:
+The default provider is `payment_mock`, a local mock implementation that returns a successful Flutterwave-like transfer response without calling an external API or requiring secrets:
+
+```env
+CASHBACK_PAYMENT_PROVIDER=payment_mock
+PAYMENT_MOCK_MODE=local
+```
+
+Use Flutterwave only when real v3 credentials are available:
 
 ```env
 CASHBACK_PAYMENT_PROVIDER=flutterwave
-FLUTTERWAVE_CLIENT_ID=
-FLUTTERWAVE_CLIENT_SECRET=
-FLUTTERWAVE_TOKEN_URL=https://idp.flutterwave.com/realms/flutterwave/protocol/openid-connect/token
-FLUTTERWAVE_BASE_URL=https://developersandbox-api.flutterwave.com
+FLUTTERWAVE_SECRET_KEY=
+FLUTTERWAVE_BASE_URL=https://api.flutterwave.com/v3
 FLUTTERWAVE_CALLBACK_URL=
-FLUTTERWAVE_SCENARIO_KEY=
+```
+
+The Flutterwave implementation uses the v3 transfer API:
+
+```http
+POST /transfers
+Authorization: Bearer {FLUTTERWAVE_SECRET_KEY}
 ```
 
 The cashback listener sends NGN 300 as `30000` kobo. User bank details come from the user's `UserPayoutAccount` record.

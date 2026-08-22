@@ -2,8 +2,8 @@
 
 namespace App\Contracts\Payments;
 
-use App\Payments\CashbackPaymentRequest;
-use App\Payments\PaymentResult;
+use App\Payments\Payload\CashbackPaymentRequest;
+use App\Payments\Payload\PaymentResult;
 
 interface CashbackPaymentProvider
 {

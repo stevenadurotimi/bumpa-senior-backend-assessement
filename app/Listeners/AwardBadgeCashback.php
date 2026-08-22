@@ -6,7 +6,7 @@ use App\Contracts\Payments\CashbackPaymentProvider;
 use App\Events\BadgeUnlocked;
 use App\Models\Badge;
 use App\Models\CashbackTransaction;
-use App\Payments\CashbackPaymentRequest;
+use App\Payments\Payload\CashbackPaymentRequest;
 
 class AwardBadgeCashback
 {
@@ -22,7 +22,7 @@ class AwardBadgeCashback
             return;
         }
 
-        $provider = (string) config('cashback.provider', 'flutterwave');
+        $provider = (string) config('cashback.provider', 'payment_mock');
         $idempotencyKey = "badge-cashback:{$event->user->getKey()}:{$badge->getKey()}";
 
         $transaction = CashbackTransaction::query()->firstOrCreate(

@@ -5,8 +5,8 @@ use App\Events\BadgeUnlocked;
 use App\Models\Badge;
 use App\Models\CashbackTransaction;
 use App\Models\User;
-use App\Payments\CashbackPaymentRequest;
-use App\Payments\PaymentResult;
+use App\Payments\Payload\CashbackPaymentRequest;
+use App\Payments\Payload\PaymentResult;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Event;
 

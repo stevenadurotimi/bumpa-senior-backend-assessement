@@ -2,8 +2,8 @@
 
 use App\Contracts\Payments\CashbackPaymentProvider;
 use App\Models\User;
-use App\Payments\CashbackPaymentRequest;
-use App\Payments\FlutterwaveServiceProvider;
+use App\Payments\Payload\CashbackPaymentRequest;
+use App\Payments\Providers\FlutterwaveServiceProvider;
 use Illuminate\Support\Facades\Http;
 
 test('cashback payment provider resolves to flutterwave implementation', function () {
@@ -13,13 +13,9 @@ test('cashback payment provider resolves to flutterwave implementation', functio
         ->toBeInstanceOf(FlutterwaveServiceProvider::class);
 });
 
-test('flutterwave provider requests an access token and creates a direct bank transfer', function () {
+test('flutterwave provider creates a v3 bank transfer with the secret key', function () {
     Http::fake([
-        'https://idp.flutterwave.test/token' => Http::response([
-            'access_token' => 'test-access-token',
-            'expires_in' => 600,
-        ]),
-        'https://api.flutterwave.test/direct-transfers' => Http::response([
+        'https://api.flutterwave.test/v3/transfers' => Http::response([
             'status' => 'success',
             'message' => 'Transfer created',
             'data' => [
@@ -31,12 +27,9 @@ test('flutterwave provider requests an access token and creates a direct bank tr
     ]);
 
     $provider = new FlutterwaveServiceProvider([
-        'client_id' => 'client-id',
-        'client_secret' => 'client-secret',
-        'token_url' => 'https://idp.flutterwave.test/token',
-        'base_url' => 'https://api.flutterwave.test',
+        'secret_key' => 'FLWSECK_TEST-secret-key-X',
+        'base_url' => 'https://api.flutterwave.test/v3',
         'callback_url' => null,
-        'scenario_key' => null,
     ]);
 
     $result = $provider->sendCashback(new CashbackPaymentRequest(
@@ -51,19 +44,11 @@ test('flutterwave provider requests an access token and creates a direct bank tr
     expect($result->successful)->toBeTrue()
         ->and($result->providerReference)->toBe('trf_123');
 
-    Http::assertSent(fn ($request) => $request->url() === 'https://idp.flutterwave.test/token'
-        && $request['client_id'] === 'client-id'
-        && $request['client_secret'] === 'client-secret'
-        && $request['grant_type'] === 'client_credentials');
-
-    Http::assertSent(fn ($request) => $request->url() === 'https://api.flutterwave.test/direct-transfers'
-        && $request->hasHeader('Authorization', 'Bearer test-access-token')
-        && $request->hasHeader('X-Idempotency-Key', 'badge-cashback-1')
-        && $request['action'] === 'instant'
-        && $request['type'] === 'bank'
+    Http::assertSent(fn ($request) => $request->url() === 'https://api.flutterwave.test/v3/transfers'
+        && $request->hasHeader('Authorization', 'Bearer FLWSECK_TEST-secret-key-X')
         && $request['reference'] === 'cashback-1'
-        && $request['payment_instruction']['source_currency'] === 'NGN'
-        && $request['payment_instruction']['amount']['value'] === 300.0
-        && $request['payment_instruction']['recipient']['bank']['code'] === '044'
-        && $request['payment_instruction']['recipient']['bank']['account_number'] === '0690000031');
+        && $request['currency'] === 'NGN'
+        && $request['amount'] === 300.0
+        && $request['account_bank'] === '044'
+        && $request['account_number'] === '0690000031');
 });

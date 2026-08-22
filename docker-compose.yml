@@ -28,6 +28,8 @@ services:
       SESSION_DRIVER: database
       CACHE_STORE: database
       QUEUE_CONNECTION: database
+      CASHBACK_PAYMENT_PROVIDER: payment_mock
+      PAYMENT_MOCK_MODE: docker
 
     # Expose the app at http://localhost:7000 on the host machine.
     # The container still listens on port 8000 internally.

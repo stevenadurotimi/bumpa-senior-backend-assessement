@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Payments;
+namespace App\Payments\Payload;
 
 use App\Models\User;
 
