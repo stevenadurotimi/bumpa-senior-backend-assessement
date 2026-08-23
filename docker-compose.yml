@@ -7,8 +7,9 @@ services:
       dockerfile: Dockerfile
 
     # Override the Dockerfile CMD when using Compose.
-    # This runs database migrations before starting the Laravel server.
-    command: sh -c "php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=8000"
+    # This resets and seeds demo data before starting the Laravel server, so
+    # testers only need to run `docker compose up --build`.
+    command: sh -c "php artisan migrate:fresh --seed --force && php artisan serve --host=0.0.0.0 --port=8000"
 
     # Runtime environment for the Laravel app inside Docker.
     # The app connects to Postgres through the Compose service name: `database`.

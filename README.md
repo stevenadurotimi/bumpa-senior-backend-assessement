@@ -4,16 +4,20 @@ This is an API-only Laravel implementation for the Bumpa backend assessment. It 
 
 ## Requirements
 
-- PHP 8.3+
-- Composer
 - Docker and Docker Compose
+- PHP 8.3+ and Composer only if you want to run the app without Docker
 
-## Docker Setup
+## Quick Start With Docker
 
-Start the application and Postgres database:
+Create the environment file:
 
 ```bash
 cp .env.example .env
+```
+
+Start the Laravel app and Postgres:
+
+```bash
 docker compose up --build
 ```
 
@@ -25,38 +29,30 @@ http://localhost:7000
 
 Inside Docker, Laravel listens on port `8000`; Docker Compose maps that to port `7000` on the host.
 
-The `app` service waits for Postgres to become healthy, then runs:
+The `app` service waits for Postgres to become healthy, resets and seeds the database, then starts Laravel:
 
 ```bash
-php artisan migrate --force
+php artisan migrate:fresh --seed --force
 php artisan serve --host=0.0.0.0 --port=8000
 ```
 
-Run seeders inside the app container:
+This creates achievement definitions, badge definitions, demo users, purchases, payout accounts, and cashback records automatically.
+
+Run tests from the project root:
 
 ```bash
-docker compose exec app php artisan db:seed
+php artisan test
 ```
 
-Reset and seed the database:
+Useful Docker commands:
 
 ```bash
-docker compose exec app php artisan migrate:fresh --seed
-```
-
-Run tests in Docker:
-
-```bash
-docker compose exec app php artisan test
+docker compose down
 ```
 
 ## Local Development
 
-Start only the database:
-
-```bash
-docker compose up database
-```
+Use this path only if you want to run Laravel directly on your machine while keeping Postgres in Docker.
 
 Install dependencies and prepare the app:
 
@@ -67,10 +63,24 @@ php artisan key:generate
 php artisan migrate --seed
 ```
 
-Start the local Laravel server:
+Start only Postgres:
 
 ```bash
-composer dev
+docker compose up database
+```
+
+After the database service finishes starting, start Laravel from the project
+root with either command:
+
+```bash
+composer run dev
+php artisan serve
+```
+
+Both commands start Laravel on:
+
+```text
+http://localhost:8000
 ```
 
 Run tests locally:
@@ -99,7 +109,7 @@ Seeded badges:
 
 ## API
 
-After running `php artisan migrate:fresh --seed`, demo users are available for manual testing. Fetch the user list first, copy an `id`, then call the achievement progress endpoint for that user.
+After `docker compose up --build` finishes starting the app, demo users are available for manual testing. Fetch the user list first, copy an `id`, then call the achievement progress endpoint for that user.
 
 ### List Users
 
@@ -249,7 +259,7 @@ Failed cashback attempts are recorded with failure details. If a user has no pay
 
 ## Verification
 
-Run the full test suite:
+Run the full test suite from the project root:
 
 ```bash
 php artisan test
@@ -260,6 +270,5 @@ Fresh Docker verification:
 ```bash
 cp .env.example .env
 docker compose up --build
-docker compose exec app php artisan migrate:fresh --seed
-docker compose exec app php artisan test
+php artisan test
 ```
