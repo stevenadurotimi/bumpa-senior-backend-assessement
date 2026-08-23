@@ -2,8 +2,6 @@
 
 This is an API-only Laravel implementation for the Bumpa backend assessment. It tracks purchase-driven achievements, unlocks badges from achievement counts, awards NGN 300 cashback on each newly unlocked badge, and exposes a user achievement progress endpoint.
 
-There is no frontend or Vite process in this project.
-
 ## Requirements
 
 - PHP 8.3+
