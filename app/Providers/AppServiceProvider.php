@@ -9,12 +9,13 @@ use InvalidArgumentException;
 class AppServiceProvider extends ServiceProvider
 {
     /**
-     * Register any application services.
+     * Bind the cashback contract to the provider selected in config/cashback.php.
+     *
+     * Domain code depends on CashbackPaymentProvider, so switching from the
+     * local mock to Flutterwave or a future provider only requires config.
      */
     public function register(): void
     {
-        // Bind the cashback contract to whichever provider is selected in
-        // config/cashback.php, keeping domain code provider-agnostic.
         $this->app->bind(
             CashbackPaymentProvider::class,
             function () {
@@ -31,10 +32,11 @@ class AppServiceProvider extends ServiceProvider
     }
 
     /**
-     * Bootstrap any application services.
+     * Bootstrap application services.
+     *
+     * Reward listeners are registered through Laravel event discovery.
      */
     public function boot(): void
     {
-        // Reward listeners are registered through Laravel event discovery.
     }
 }

@@ -20,9 +20,11 @@ class Purchase extends Model
         return $this->belongsTo(User::class);
     }
 
+    /**
+     * Dispatch the purchase event that starts the reward workflow.
+     */
     protected static function booted(): void
     {
-        // New purchases are the entry point for the reward workflow.
         static::created(fn (Purchase $purchase) => PurchaseRecorded::dispatch($purchase));
     }
 

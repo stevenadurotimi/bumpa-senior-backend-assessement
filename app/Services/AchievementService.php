@@ -13,16 +13,18 @@ class AchievementService
 {
     /**
      * Unlock one achievement for a user and emit the assessment-required event.
+     *
+     * The existing check handles normal duplicate calls before attempting a
+     * database write, while the pivot unique constraint remains the final guard
+     * for concurrent or replayed unlock attempts.
      */
     public function unlock(User $user, Achievement $achievement): bool
     {
-        // Fast path for normal duplicate calls before attempting a database write.
         if ($user->achievements()->whereKey($achievement->getKey())->exists()) {
             return false;
         }
 
         try {
-            // The pivot unique constraint is the final idempotency guard.
             $user->achievements()->attach($achievement->getKey(), [
                 'unlocked_at' => now(),
             ]);
@@ -38,6 +40,11 @@ class AchievementService
     /**
      * Build the read model used by GET /users/{user}/achievements.
      *
+     * The endpoint returns ordered achievement names instead of database rows.
+     * Current and next badge values are calculated from unlocked badge state
+     * and badge thresholds, so the API can show progress without exposing the
+     * internal pivot tables.
+     *
      * @return array{
      *     unlocked_achievements: list<string>,
      *     next_available_achievements: list<string>,
@@ -48,7 +55,6 @@ class AchievementService
      */
     public function progressFor(User $user): array
     {
-        // The API returns unlocked achievements as ordered names, not database rows.
         $unlockedAchievements = $user->achievements()
             ->orderBy('sort_order')
             ->orderBy('threshold')
@@ -57,13 +63,11 @@ class AchievementService
         $unlockedAchievementIds = $unlockedAchievements->modelKeys();
         $unlockedAchievementCount = $unlockedAchievements->count();
 
-        // The current badge is the highest threshold badge the user has unlocked.
         $currentBadge = $user->badges()
             ->orderByDesc('required_achievements_count')
             ->orderByDesc('sort_order')
             ->first();
 
-        // The next badge is the first badge above the current badge threshold.
         $nextBadge = Badge::query()
             ->when(
                 $currentBadge,

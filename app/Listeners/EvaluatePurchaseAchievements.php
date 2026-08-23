@@ -13,10 +13,13 @@ readonly class EvaluatePurchaseAchievements
 
     /**
      * Re-check purchase milestones whenever a purchase is recorded.
+     *
+     * The purchase event may contain a model that already has its user loaded.
+     * loadMissing keeps that path efficient while still supporting events that
+     * carry a bare Purchase model.
      */
     public function handle(PurchaseRecorded $event): void
     {
-        // loadMissing avoids re-querying the user if the purchase already has it.
         $purchase = $event->purchase->loadMissing('user');
         $user = $purchase->user;
         $purchaseCount = $user->purchases()->count();
